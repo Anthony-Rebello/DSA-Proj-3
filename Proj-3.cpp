@@ -5,6 +5,7 @@ struct Tile{
     bool blocked, start, end;
     unsigned int weight;
 
+    //constructors for the Tile object
     Tile(){
         blocked = false, start = false, end = false;
         weight = 0;
@@ -13,42 +14,55 @@ struct Tile{
         blocked = isBlocked, start = false, end = false;
         weight = w;
     }
-    void makeStart(Tile& tile){
-        tile.start = true;
+    //functions to block or change the weight of a tile
+    void block(){
+        blocked = true;
     }
-    void makeEnd(Tile& tile){
-        tile.end = true;
+    void changeWeight(unsigned int w){
+        weight = w;
+    }
+    //functions to make tile the start or end of the board
+    void makeStart(){
+        start = true;
+    }
+    void makeEnd(){
+        end = true;
     }
 };
 class Graph{
-    int size = 0;
-    Tile* matrix = nullptr;
 
-    Graph(int row, int column){
-        Tile arrMatrix[row][column];
-        matrix = *arrMatrix;
-    }
+    public:
+        int size = 0;
+        Tile* matrix = nullptr;
+
+        //constructor for the graph object
+        Graph(int row, int column){
+            Tile arrMatrix[row][column];
+            size = row * column;
+            matrix = *arrMatrix;
+        }
 
 };
 
-void breadthFirstTrav(){
+void breadthFirstTrav(Tile& startTile){
+    
+}
+
+void depthFirstTrav(Tile& startTile){
 
 }
 
-void depthFirstTrav(){
+void dijkstra(Tile& startTile){
 
 }
 
-void dijkstra(){
-
-}
-
-void bellmanFord(){
+void bellmanFord(Tile& startTile){
 
 }
 
 int main(){
 
+    //debug statememnt vv
     cout << "this works still" << endl;
     return 0;
 }
