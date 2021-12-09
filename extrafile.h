@@ -5,6 +5,7 @@ using namespace std;
 
 struct Tile{
     unsigned int tile_type;
+    unsigned int col,row;
     unsigned int weight;
     sf::Sprite sprite;
     Tile();
@@ -97,9 +98,13 @@ void Graph::LoadInitialGui(sf::RenderWindow& window) {
     Tile a;
     a.setSprite("Empty_Tile");
     for(int i = 0; i < 21; i++) {
+        a.row = i;
         rows.push_back(a);
     }
     for(int i = 0; i < 30; i++) {
+        for(int j = 0; j < 21; j++) {
+            rows[j].col = i;
+        }
         matrix.push_back(rows);
     }
     for(int i = 0; i < 21; i++){
