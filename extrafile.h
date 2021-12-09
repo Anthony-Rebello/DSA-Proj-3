@@ -236,11 +236,44 @@ void depthFirstTrav(Tile& startTile){
 
 }
 
-void dijkstra(Tile& startTile){
+void dijkstra(Tile& startTile) {
+  vector<int> result(630, 20000);
+  priority_queue<pair<Tile, int>, vector<pair<Tile, int>>, greater<pair<Tile, int>>> pq;
+  pq.push(make_pair(startTile, startTile.weight));
 
+  result[startTile.column + startTile.row * 5] = 0;
+  // Just a for loop that loops through the matrix and gives me something I can work with.
+  /*
+  static int counter = 0;
+  for (int i = 0; i < matrix.size(); i++) {
+    for (int j = 0; j < matrix[i].size(); j++) {
+      if (matrix[i][j] == startTile) {
+        phraser[counter] = make_pair(startTile, startTile.weight);
+        result[counter] = 0;
+        counter++;
+      } else {
+        phraser[counter] = make_pair(matrix[i][j], matrix[i][j].weight);
+        counter++;
+      }
+    }
+  }
+  */
+  while (!pq.empty()) {
+    int u = pq.top().second;
+    pq.pop();
+    for (int i = 0; i < graph.adjList[u].size(); i++) {
+         int v = graph.adjList[u][i].first;
+         int weight = graph.adjList[u][i].second;
+
+         //  If there is shorted path to v through u.
+         if (result[v] > result[u] + weight) {
+             result[v] = result[u] + weight;
+             pq.push(make_pair(result[v], v));
+         }
+         }
+ }
 }
 
 void bellmanFord(Tile& startTile){
 
 }
-
