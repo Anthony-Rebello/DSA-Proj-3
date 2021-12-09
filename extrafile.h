@@ -239,41 +239,44 @@ void depthFirstTrav(Tile& startTile){
 void dijkstra(Tile& startTile) {
   vector<int> result(630, 20000);
   priority_queue<pair<Tile, int>, vector<pair<Tile, int>>, greater<pair<Tile, int>>> pq;
-  pq.push(make_pair(startTile, startTile.weight));
+  pq.push(make_pair(startTile.weight, startTile));
 
-  result[startTile.column + startTile.row * 5] = 0;
-  // Just a for loop that loops through the matrix and gives me something I can work with.
-  /*
-  static int counter = 0;
-  for (int i = 0; i < matrix.size(); i++) {
-    for (int j = 0; j < matrix[i].size(); j++) {
-      if (matrix[i][j] == startTile) {
-        phraser[counter] = make_pair(startTile, startTile.weight);
-        result[counter] = 0;
-        counter++;
-      } else {
-        phraser[counter] = make_pair(matrix[i][j], matrix[i][j].weight);
-        counter++;
-      }
-    }
-  }
-  */
+  result[startTile.col + startTile.row * 21] = 0;
+
   while (!pq.empty()) {
-    int u = pq.top().second;
+    int oldV = pq.top().second;
     pq.pop();
-    for (int i = 0; i < graph.adjList[u].size(); i++) {
-         int v = graph.adjList[u][i].first;
-         int weight = graph.adjList[u][i].second;
+    for (int i = 0; i < 4; i++) {
+      int v, weight;
+
+      // Cycle through all adjacent neighbors & check if it's accessing an invalid index.
+      // Not added here, since I don't know how you want to phrase it, but this does
+      // **NOT** check if the tile is a void/blocked tile!
+
+      if (i == 0 && oldV.row - 1 != -1) {
+        v = matrix[oldV.col][oldV.row - 1];
+        weight = matrix[oldV.col][oldV.row - 1].weight;
+      } else if (i == 1 && oldV.row + 1 != 30) {
+        v = matrix[oldV.col][oldV.row + 1];
+        weight = matrix[oldV.col][oldV.row + 1].weight;
+      } else if (i == 2 && oldV.col - 1 != -1) {
+        v = matrix[oldV.col - 1][oldV.row];
+        weight = matrix[oldV.col][oldV.row - 1].weight;
+      } else if (i == 3 && oldV.col + 1 != 21) {
+        v = matrix[oldV.col + 1][oldV.row];
+        weight = matrix[oldV.col][oldV.row + 1].weight;
+      }
 
          //  If there is shorted path to v through u.
-         if (result[v] > result[u] + weight) {
-             result[v] = result[u] + weight;
-             pq.push(make_pair(result[v], v));
+         if (result[v.col + v.row * 21] > result[oldV.col + oldV.row * 21] + weight) {
+             result[v.col + v.row * 21] = result[oldV.col + oldV.row * 21] + weight
+             pq.push(make_pair(matrix[v.col][v.row].weight, matrix[v.col][v.row]));
          }
          }
  }
 }
 
 void bellmanFord(Tile& startTile){
-
+  vector<int> result(630, 20000);
+  result[startTile.col + startTile.row * 21] = 0;
 }
