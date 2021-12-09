@@ -84,12 +84,13 @@ public:
     sf::Sprite run_btn;
     sf::Sprite reset_btn;
 
-
     void LoadInitialGui(sf::RenderWindow& window);
     void LoadTileData();
     void UpdateGraph(sf::RenderWindow& window);
 
 };
+
+
 void Graph::LoadInitialGui(sf::RenderWindow& window) {
     matrix.clear();
     c_current_tile = "";
@@ -224,6 +225,32 @@ void Graph::UpdateGraph(sf::RenderWindow& window){
             window.draw(matrix[j][i].sprite);
         }
     }
+    sf::Font font;
+    font.loadFromFile("Assets/font.ttf");
+    vector<sf::Text> tile_text_row;
+    vector<vector<sf::Text>> tile_text;
+    //[col][row]
+    sf::Text text;
+    for(int i = 0; i < 21; i++) {
+        text.setFont(font);
+        text.setCharacterSize(21);
+        text.setFillColor(sf::Color::Black);
+        tile_text_row.push_back(text);
+    }
+    for(int i = 0; i < 30; i++) {
+        for (int j = 0; j < 21; j++) {
+            if (matrix[i][j].weight != 0){
+                tile_text_row[j].setString(to_string(matrix[i][j].weight));
+                }
+        }
+        tile_text.push_back(tile_text_row);
+    }
+    for (int i = 0; i < 21; ++i) {
+        for (int j = 0; j < 30; ++j) {
+            tile_text[j][i].setPosition(290 + (j*32),71 + (i*32));
+            window.draw(tile_text[j][i]);
+        }
+    }
 }
 
 
@@ -236,44 +263,11 @@ void depthFirstTrav(Tile& startTile){
 
 }
 
-void dijkstra(Tile& startTile) {
-  vector<int> result(630, 20000);
-  priority_queue<pair<Tile, int>, vector<pair<Tile, int>>, greater<pair<Tile, int>>> pq;
-  pq.push(make_pair(startTile, startTile.weight));
+void dijkstra(Tile& startTile){
 
-  result[startTile.column + startTile.row * 5] = 0;
-  // Just a for loop that loops through the matrix and gives me something I can work with.
-  /*
-  static int counter = 0;
-  for (int i = 0; i < matrix.size(); i++) {
-    for (int j = 0; j < matrix[i].size(); j++) {
-      if (matrix[i][j] == startTile) {
-        phraser[counter] = make_pair(startTile, startTile.weight);
-        result[counter] = 0;
-        counter++;
-      } else {
-        phraser[counter] = make_pair(matrix[i][j], matrix[i][j].weight);
-        counter++;
-      }
-    }
-  }
-  */
-  while (!pq.empty()) {
-    int u = pq.top().second;
-    pq.pop();
-    for (int i = 0; i < graph.adjList[u].size(); i++) {
-         int v = graph.adjList[u][i].first;
-         int weight = graph.adjList[u][i].second;
-
-         //  If there is shorted path to v through u.
-         if (result[v] > result[u] + weight) {
-             result[v] = result[u] + weight;
-             pq.push(make_pair(result[v], v));
-         }
-         }
- }
 }
 
 void bellmanFord(Tile& startTile){
 
 }
+
