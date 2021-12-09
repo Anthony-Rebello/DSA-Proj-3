@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 struct Tile{
@@ -33,13 +34,14 @@ class Graph{
 
     public:
         int size = 0;
-        Tile* matrix = nullptr;
+        vector<vector<Tile> > matrix;
 
         //constructor for the graph object
         Graph(int row, int column){
-            Tile arrMatrix[row][column];
-            size = row * column;
-            matrix = *arrMatrix;
+            matrix.resize(row);
+            for(int i = 0; i < row; i++){
+                matrix.at(i).resize(column);
+            }
         }
 
 };
