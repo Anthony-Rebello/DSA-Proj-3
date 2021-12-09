@@ -13,25 +13,31 @@ int main() {
     window.clear(sf::Color::White);
     sf::Event event{};
     graph.LoadInitialGui(window);
-//    -----------------------------------------------------------------------
-    sf::Font font;
-    sf::Text text;
-    font.loadFromFile("Assets/font.ttf");
-    text.setFont(font);
-    text.setString("");
-    text.setCharacterSize(21);
-    text.setFillColor(sf::Color::Black);
-    text.setPosition(290,71);
-//    -----------------------------------------------------------------------
     while (window.isOpen()) {
         while (window.pollEvent(event)) {
             sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
             if (event.type == sf::Event::Closed)
                 window.close();
+
+            if (event.type == sf::Event::TextEntered && graph.can_customize_weight) {
+
+                    if (event.text.unicode == '\b' && !graph.c_weight.empty()) {
+                        graph.c_weight.pop_back();
+                    } else if (graph.c_weight.size() < 2 && event.text.unicode >= 48 && event.text.unicode <= 57) {
+                        graph.c_weight += event.text.unicode;
+                    }
+                if (graph.c_weight.size() == 2)
+                    graph.can_customize_weight = false;
+
+                if (graph.c_weight.size() == 2)
+                    graph.can_customize_weight = false;
+            }
+
+
+
             //0 = Empty; 1 = Start; 2 = End; 3 = Positive; 4 = Negative; 5 = Inaccessible 6 = Visited;
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-            for (int i = 0;
-                 i < graph.matrix[0].size(); i++) { //should get number of rows and below should be number of col 21x30
+            for (int i = 0;i < graph.matrix[0].size(); i++) { //should get number of rows and below should be number of col 21x30
                 for (int j = 0; j < graph.matrix.size(); j++) {
                     sf::FloatRect tile_rect = graph.matrix[j][i].sprite.getGlobalBounds();
                     if (tile_rect.contains(mousePos) && graph.c_current_tile == "Start_Tile") {
@@ -49,8 +55,12 @@ int main() {
                     if (tile_rect.contains(mousePos) && graph.c_current_tile == "Positive_Cost_Tile") {
                         graph.matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Positive_Cost_Tile"));
                         graph.matrix[j][i].tile_type = 3;
+                        if (!graph.c_weight.empty())
+                            graph.matrix[j][i].weight = stoi(graph.c_weight);
+
                     }
                     if (tile_rect.contains(mousePos) && graph.c_current_tile == "Negative_Cost_Tile") {
+
                         graph.matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Negative_Cost_Tile"));
                         graph.matrix[j][i].tile_type = 4;
                     }
@@ -79,6 +89,7 @@ int main() {
             if (rect.contains(mousePos)) {
                 graph.c_current_tile = "Positive_Cost_Tile";
                 graph.customize_1_1.setTexture(TextureManager::GetTexture("Positive_Cost_Tile"));
+                graph.can_customize_weight = true;
             }
             rect = graph.customize_6_1.getGlobalBounds();
             if (rect.contains(mousePos)) {
@@ -98,7 +109,6 @@ int main() {
         }
         }
             graph.UpdateGraph(window);
-            window.draw(text);
             window.display();
     }
 }
