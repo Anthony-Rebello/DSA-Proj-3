@@ -18,45 +18,47 @@ struct Tile{
     void setSpritePosition(float x, float y);
 
 };
-    //constructors for the Tile object
+//constructors for the Tile object
 
 
-    Tile::Tile(){
-        //0 = Empty; 1 = Start; 2 = End; 3 = Positive; 4 = Negative; 5 = Inaccessible 6 = Visited;
-        unsigned int tile_type = 0;
-        weight = 0;
-    }
-    Tile::Tile(unsigned int tile_type, unsigned int w){
-        tile_type = tile_type;
-        weight = w;
-    }
-    //functions to block or change the weight of a tile
-    void Tile::block(){
-        tile_type = 5;
-    }
-    void Tile::changeWeight(unsigned int w){
-        weight = w;
-    }
-    //functions to make tile the start or end of the board
-    void Tile::makeStart(){
-        tile_type = 1;
-    }
-    void Tile::makeEnd(){
-        tile_type = 2;
-    }
-    void Tile::setSprite(string texture){
-        sprite.setTexture(TextureManager::GetTexture(texture));
-    }
-    void Tile::setSpritePosition(float x, float y) {
-        sprite.setPosition(x,y);
-    }
+Tile::Tile(){
+    //0 = Empty; 1 = Start; 2 = End; 3 = Positive; 4 = Negative; 5 = Inaccessible 6 = Visited;
+    unsigned int tile_type = 0;
+    weight = 0;
+}
+Tile::Tile(unsigned int tile_type, unsigned int w){
+    tile_type = tile_type;
+    weight = w;
+}
+//functions to block or change the weight of a tile
+void Tile::block(){
+    tile_type = 5;
+}
+void Tile::changeWeight(unsigned int w){
+    weight = w;
+}
+//functions to make tile the start or end of the board
+void Tile::makeStart(){
+    tile_type = 1;
+}
+void Tile::makeEnd(){
+    tile_type = 2;
+}
+void Tile::setSprite(string texture){
+    sprite.setTexture(TextureManager::GetTexture(texture));
+}
+void Tile::setSpritePosition(float x, float y) {
+    sprite.setPosition(x,y);
+}
 
 
 
 class Graph{
 
 public:
-//    int size = 0;
+    string c_weight;
+    bool can_customize_weight = false;
+    //    int size = 0;
 //    Tile* matrix = nullptr;
     //constructor for the graph object
     Graph(int row, int column){
@@ -87,6 +89,7 @@ public:
     void LoadInitialGui(sf::RenderWindow& window);
     void LoadTileData();
     void UpdateGraph(sf::RenderWindow& window);
+    void dijkstra(Tile& startTile);
 
 };
 
@@ -183,7 +186,7 @@ void  Graph::LoadTileData() {
     for(int i = 0; i < 21; i++){
         for(int j = 0; j < 30; j++){
             //0 = Empty; 1 = Start; 2 = End; 3 = Positive; 4 = Negative; 5 = Inaccessible 6 = Visited;
-            if (matrix[j][i].tile_type = 1)
+            if (matrix[j][i].tile_type == 1)
                 matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Start_Tile"));
 
             else if (matrix[j][i].tile_type == 2)
@@ -225,6 +228,7 @@ void Graph::UpdateGraph(sf::RenderWindow& window){
             window.draw(matrix[j][i].sprite);
         }
     }
+    //updates tile weights on GUI
     sf::Font font;
     font.loadFromFile("Assets/font.ttf");
     vector<sf::Text> tile_text_row;
@@ -239,18 +243,28 @@ void Graph::UpdateGraph(sf::RenderWindow& window){
     }
     for(int i = 0; i < 30; i++) {
         for (int j = 0; j < 21; j++) {
-            if (matrix[i][j].weight != 0){
-                tile_text_row[j].setString(to_string(matrix[i][j].weight));
-                }
+
         }
         tile_text.push_back(tile_text_row);
     }
     for (int i = 0; i < 21; ++i) {
         for (int j = 0; j < 30; ++j) {
+            if (matrix[j][i].weight != 0){
+                tile_text[j][i].setString(to_string(matrix[j][i].weight));
+            }
             tile_text[j][i].setPosition(290 + (j*32),71 + (i*32));
             window.draw(tile_text[j][i]);
         }
     }
+    //updates customizable tile weight
+    sf::Text weight_text;
+    weight_text.setFont(font);
+    weight_text.setCharacterSize(51);
+    weight_text.setFillColor(sf::Color::Black);
+    weight_text.setPosition(1370,468);
+    weight_text.setString(c_weight);
+    window.draw(weight_text);
+
 }
 
 
@@ -263,47 +277,47 @@ void depthFirstTrav(Tile& startTile){
 
 }
 
-void dijkstra(Tile& startTile) {
-  vector<int> result(630, 20000);
-  priority_queue<pair<Tile, int>, vector<pair<Tile, int>>, greater<pair<Tile, int>>> pq;
-  pq.push(make_pair(startTile.weight, startTile));
-
-  result[startTile.col + startTile.row * 21] = 0;
-
-  while (!pq.empty()) {
-    int oldV = pq.top().second;
-    pq.pop();
-    for (int i = 0; i < 4; i++) {
-      int v, weight;
-
-      // Cycle through all adjacent neighbors & check if it's accessing an invalid index.
-      // Not added here, since I don't know how you want to phrase it, but this does
-      // **NOT** check if the tile is a void/blocked tile!
-
-      if (i == 0 && oldV.row - 1 != -1) {
-        v = matrix[oldV.col][oldV.row - 1];
-        weight = matrix[oldV.col][oldV.row - 1].weight;
-      } else if (i == 1 && oldV.row + 1 != 30) {
-        v = matrix[oldV.col][oldV.row + 1];
-        weight = matrix[oldV.col][oldV.row + 1].weight;
-      } else if (i == 2 && oldV.col - 1 != -1) {
-        v = matrix[oldV.col - 1][oldV.row];
-        weight = matrix[oldV.col][oldV.row - 1].weight;
-      } else if (i == 3 && oldV.col + 1 != 21) {
-        v = matrix[oldV.col + 1][oldV.row];
-        weight = matrix[oldV.col][oldV.row + 1].weight;
-      }
-
-         //  If there is shorted path to v through u.
-         if (result[v.col + v.row * 21] > result[oldV.col + oldV.row * 21] + weight) {
-             result[v.col + v.row * 21] = result[oldV.col + oldV.row * 21] + weight
-             pq.push(make_pair(matrix[v.col][v.row].weight, matrix[v.col][v.row]));
-         }
-         }
- }
-}
-
-void bellmanFord(Tile& startTile){
-  vector<int> result(630, 20000);
-  result[startTile.col + startTile.row * 21] = 0;
-}
+//void Graph::dijkstra(Tile& startTile) {
+//    vector<int> result(630, 20000);
+//    priority_queue<pair<Tile, int>, vector<pair<Tile, int>>, greater<pair<Tile, int>>> pq;
+//    pq.push(make_pair(startTile.weight, startTile));
+//
+//    result[startTile.col + startTile.row * 21] = 0;
+//
+//    while (!pq.empty()) {
+//        int oldV = pq.top().second;
+//        pq.pop();
+//        for (int i = 0; i < 4; i++) {
+//            int v, weight;
+//
+//            // Cycle through all adjacent neighbors & check if it's accessing an invalid index.
+//            // Not added here, since I don't know how you want to phrase it, but this does
+//            // **NOT** check if the tile is a void/blocked tile!
+//
+//            if (i == 0 && oldV.row - 1 != -1) {
+//                v = matrix[oldV.col][oldV.row - 1];
+//                weight = matrix[oldV.col][oldV.row - 1].weight;
+//            } else if (i == 1 && oldV.row + 1 != 30) {
+//                v = matrix[oldV.col][oldV.row + 1];
+//                weight = matrix[oldV.col][oldV.row + 1].weight;
+//            } else if (i == 2 && oldV.col - 1 != -1) {
+//                v = matrix[oldV.col - 1][oldV.row];
+//                weight = matrix[oldV.col][oldV.row - 1].weight;
+//            } else if (i == 3 && oldV.col + 1 != 21) {
+//                v = matrix[oldV.col + 1][oldV.row];
+//                weight = matrix[oldV.col][oldV.row + 1].weight;
+//            }
+//
+//            //  If there is shorted path to v through u.
+//            if (result[v.col + v.row * 21] > result[oldV.col + oldV.row * 21] + weight) {
+//                result[v.col + v.row * 21] = result[oldV.col + oldV.row * 21] + weight
+//                pq.push(make_pair(matrix[v.col][v.row].weight, matrix[v.col][v.row]));
+//            }
+//        }
+//    }
+//}
+//
+//void bellmanFord(Tile& startTile){
+//    vector<int> result(630, 20000);
+//    result[startTile.col + startTile.row * 21] = 0;
+//}
