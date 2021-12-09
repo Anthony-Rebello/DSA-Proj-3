@@ -84,12 +84,13 @@ public:
     sf::Sprite run_btn;
     sf::Sprite reset_btn;
 
-
     void LoadInitialGui(sf::RenderWindow& window);
     void LoadTileData();
     void UpdateGraph(sf::RenderWindow& window);
 
 };
+
+
 void Graph::LoadInitialGui(sf::RenderWindow& window) {
     matrix.clear();
     c_current_tile = "";
@@ -222,6 +223,32 @@ void Graph::UpdateGraph(sf::RenderWindow& window){
     for (int i = 0; i < 21; i++) {
         for (int j = 0; j < 30; j++) {
             window.draw(matrix[j][i].sprite);
+        }
+    }
+    sf::Font font;
+    font.loadFromFile("Assets/font.ttf");
+    vector<sf::Text> tile_text_row;
+    vector<vector<sf::Text>> tile_text;
+    //[col][row]
+    sf::Text text;
+    for(int i = 0; i < 21; i++) {
+        text.setFont(font);
+        text.setCharacterSize(21);
+        text.setFillColor(sf::Color::Black);
+        tile_text_row.push_back(text);
+    }
+    for(int i = 0; i < 30; i++) {
+        for (int j = 0; j < 21; j++) {
+            if (matrix[i][j].weight != 0){
+                tile_text_row[j].setString(to_string(matrix[i][j].weight));
+                }
+        }
+        tile_text.push_back(tile_text_row);
+    }
+    for (int i = 0; i < 21; ++i) {
+        for (int j = 0; j < 30; ++j) {
+            tile_text[j][i].setPosition(290 + (j*32),71 + (i*32));
+            window.draw(tile_text[j][i]);
         }
     }
 }
