@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <queue>
+#include <stack>
+#include <algorithm>
 using namespace std;
 
 struct Tile{
@@ -34,24 +37,71 @@ class Graph{
 
     public:
         int size = 0;
-        vector<vector<Tile> > matrix;
+        vector<Tile> nodes;
+        vector<vector<int> > matrix;
 
         //constructor for the graph object
         Graph(int row, int column){
-            matrix.resize(row);
-            for(int i = 0; i < row; i++){
-                matrix.at(i).resize(column);
+            matrix.resize(row * column);
+            nodes.resize(row * column);
+            size = row * column;
+            for(int i = 0; i < size; i++){
+                matrix.at(i).resize(row * column);
+            }
+            for(int i = 0; i < size; i++){
+                for(int j = 0; j < size; j++){
+                    if(i == j){
+                        matrix[i][j] = 0;
+                    }
+                    else{
+                        matrix[i][j] = -1;
+                    }
+                }
             }
         }
 
 };
 
-void breadthFirstTrav(Tile& startTile){
-    
+bool breadthFirstTrav(Graph& myGraph, int start, int end){
+    queue<int> q;
+    vector<int> used;
+    q.push(start);
+    used.push_back(start);
+    while(!q.empty()){
+        for(int i = 0; i < myGraph.matrix.at(q.front()).size(); i++){
+            if((myGraph.matrix[q.front()][i] != -1) &&(count(used.begin(), used.end(), i) == 0)){
+                if(i == end)
+                    return true;
+                else{
+                    q.push(i);
+                    used.push_back(i);
+                }
+            }
+        }
+        q.pop();
+    }
+    return false;
 }
 
-void depthFirstTrav(Tile& startTile){
-
+bool depthFirstTrav(Graph& myGraph, int start, int end){
+    stack<int> s;
+    vector<int> used;
+    s.push(start);
+    used.push_back(start);
+    while(!s.empty()){
+        for(int i = 0; i < myGraph.matrix[s.top()].size(); i++){
+            if((myGraph.matrix[s.top()][i] != -1) && (count(used.begin(), used.end(), i) == 0)){
+                if(i == end)
+                    return true;
+                else{
+                    s.push(i);
+                    used.push_back(i);
+                }
+            }
+        }
+        s.pop();
+    }
+    return false;
 }
 
 void dijkstra(Tile& startTile){
@@ -65,6 +115,15 @@ void bellmanFord(Tile& startTile){
 int main(){
 
     //debug statememnt vv
+    Graph g(4, 4);
+    g.matrix[0][1] = 1;
+    g.matrix[1][5] = 1;
+    g.matrix[5][6] = 1;
+    g.matrix[6][10] = 1;
+    g.matrix[10][11] = 1;
+    cout << breadthFirstTrav(g, 0, 11) << endl;
+    cout << depthFirstTrav(g, 0, 11) << endl;
+    cout << depthFirstTrav(g, 0, 12) << endl;
     cout << "this works still" << endl;
     return 0;
 }
