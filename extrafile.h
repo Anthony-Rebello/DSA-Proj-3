@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <queue>
 using namespace std;
 
 struct Tile{
@@ -232,8 +233,25 @@ void depthFirstTrav(Tile& startTile){
 
 }
 
-void dijkstra(Tile& startTile){
-  set<int> s;
+void dijkstra(Tile& startTile) {
+  vector<int> result(630, 20000);
+  priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+  pq.push(make_pair(0, src));
+  result[src] = 0;
+  while (!pq.empty()) {
+    int u = pq.top().second;
+    pq.pop();
+    for (int i = 0; i < graph.adjList[u].size(); i++) {
+         int v = graph.adjList[u][i].first;
+         int weight = graph.adjList[u][i].second;
+
+         //  If there is shorted path to v through u.
+         if (result[v] > result[u] + weight) {
+             result[v] = result[u] + weight;
+             pq.push(make_pair(result[v], v));
+         }
+         }
+ }
 }
 
 void bellmanFord(Tile& startTile){
