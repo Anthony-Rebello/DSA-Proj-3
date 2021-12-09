@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
+#include <set>
 using namespace std;
 
 struct Tile{
@@ -232,10 +233,9 @@ void depthFirstTrav(Tile& startTile){
 }
 
 void dijkstra(Tile& startTile){
-
+  set<int> s;
 }
 
 void bellmanFord(Tile& startTile){
 
 }
-
