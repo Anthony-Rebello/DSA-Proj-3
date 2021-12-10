@@ -112,10 +112,13 @@ public:
     void UpdateGraph(sf::RenderWindow& window);
     void dijkstra(Tile& startTile);
     bool depthFirstTrav(sf::RenderWindow& window, Graph& myGraph, int start, int end);
+    bool testDepthFirstTrav(Graph& myGraph, int start, int end);
+    bool testBreadthFirstTrav(Graph& myGraph, int start, int end);
     bool breadthFirstTrav(sf::RenderWindow& window,Graph& myGraph, int start, int end);
     void transferData();
     int getStart();
     int getEnd();
+    void test();
 
 };
 
@@ -596,6 +599,73 @@ bool Graph::depthFirstTrav(sf::RenderWindow& window, Graph& myGraph, int start, 
     auto duration = duration_cast<milliseconds>(end2 - begin);
     algorithm_duration = "Time: " + to_string(duration.count())+ "ms";
     return false;
+}
+bool Graph::testDepthFirstTrav( Graph& myGraph, int start, int end){
+    stack<int> s;
+    vector<int> used;
+    s.push(start);
+    used.push_back(start);
+
+    while(!s.empty()){
+        for(int i = 0; i < myGraph.matrix[s.top()].size(); i++){
+            if((myGraph.matrix[s.top()][i] != -1) && (count(used.begin(), used.end(), i) == 0)){
+                if(i == end) {
+                    return true;
+                }
+                else{
+                    s.push(i);
+                    used.push_back(i);
+                }
+            }
+        }
+        s.pop();
+    }
+    return false;
+}
+bool Graph::testBreadthFirstTrav(Graph &myGraph, int start, int end) {
+    queue<int> q;
+    vector<int> used;
+    q.push(start);
+    used.push_back(start);
+
+    while(!q.empty()){
+        for(int i = 0; i < myGraph.matrix[q.front()].size(); i++){
+            if((myGraph.matrix[q.front()][i] != -1) && (count(used.begin(), used.end(), i) == 0)){
+                if(i == end) {
+                    return true;
+                }
+                else{
+                    q.push(i);
+                    used.push_back(i);
+                }
+            }
+        }
+        q.pop();
+    }
+    return false;
+}
+
+void Graph::test(){
+    Graph testGraph(250, 400);
+    int count = 0;
+    for(int i = 0; i < 100000; i++){
+        for(int j = 0; j < 100000; j++){
+            testGraph.matrix[i][j] = count % 50;
+            count++;
+        }
+    }
+    cout << "Testing BFS... "<< endl;
+    auto start = chrono::high_resolution_clock::now();
+    testBreadthFirstTrav(testGraph, 0, 99999);
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<float> dur = end - start;
+    cout << "BFS took " << dur.count() <<  "seconds" << endl;
+    cout << "Testing DFS..." << endl;
+    start = chrono::high_resolution_clock::now();
+    testDepthFirstTrav(testGraph, 0, 99999);
+    end = chrono::high_resolution_clock::now();
+    dur = end - start;
+    cout << "DFS took " << dur.count() << " seconds" << endl;
 }
 
 
