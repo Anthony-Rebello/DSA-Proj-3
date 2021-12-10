@@ -3,7 +3,9 @@
 #include <vector>
 #include <stack>
 #include <queue>
+#include <chrono>
 using namespace std;
+using namespace chrono;
 
 struct Tile{
     //0 = Empty; 1 = Start; 2 = End; 3 = Positive; 4 = Negative; 5 = Inaccessible 6 = Visited;
@@ -56,6 +58,7 @@ public:
         vector<Tile> nodes;
         vector<vector<int> > matrix;
         //constructor for the graph object
+        //Adjacency Matrix
         Graph(int row, int column){
             matrix.resize(row * column);
             nodes.resize(row * column);
@@ -76,6 +79,8 @@ public:
         }
         // 0 = none; 1 = DFS; 2 = BFS; 3 = Dijkstra's; 4 = Bellman-Ford
     int selected_algorithm = 0;
+    string algorithm_text = "Algorithm: ";
+    string algorithm_duration = "Time: ";
     string c_weight;
     bool can_customize_weight = false;
     vector<vector<Tile>> _matrix;
@@ -240,6 +245,7 @@ void  Graph::LoadTileData() {
 }
 
 void Graph::UpdateGraph(sf::RenderWindow& window){
+    window.clear(sf::Color::White);
     window.draw(algorithms);
     window.draw(run_btn);
     window.draw(reset_btn);
@@ -251,8 +257,9 @@ void Graph::UpdateGraph(sf::RenderWindow& window){
     window.draw(customize_5);
     window.draw(customize_6);
     window.draw(customize_7);
-    for (int i = 0; i < 21; i++) {
-        for (int j = 0; j < 30; j++) {
+    for (int i = 1; i < 20; i++) {
+        for (int j = 1; j < 29; j++) {
+
             window.draw(_matrix[j][i].sprite);
         }
     }
@@ -293,9 +300,27 @@ void Graph::UpdateGraph(sf::RenderWindow& window){
     weight_text.setString(c_weight);
     window.draw(weight_text);
 
+    sf::Text algorithm;
+    sf::Text time;
+    algorithm.setFont(font);
+    algorithm.setCharacterSize(30);
+    algorithm.setFillColor(sf::Color::Red);
+    algorithm.setPosition(1000,810);
+    algorithm.setString(algorithm_text );
+    window.draw(algorithm);
+
+    time.setFont(font);
+    time.setCharacterSize(30);
+    time.setFillColor(sf::Color::Red);
+    time.setPosition(1000,910);
+    time.setString(algorithm_duration);
+    window.draw(time);
+
+
+
 }
 
-void Graph::transferData(){
+void Graph::transferData() {
 //    for (int i = 0; i < 21; ++i) {
 //        for (int j = 0; j < 30; ++j) {
     //tiles with no edges
@@ -303,15 +328,146 @@ void Graph::transferData(){
         for (int j = 1; j < 29; ++j) {
             //[from][to]
             //Left
-            matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 1 ] = _matrix[j - 1][i].weight;
+            matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 1] = _matrix[j - 1][i].weight;
             //Right
-            matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 1 ] = _matrix[j - 1][i].weight;
+            matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 1] = _matrix[j + 1][i].weight;
             //Top
             matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 30] = _matrix[j][i - 1].weight;
             //Bottom
             matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 30] = _matrix[j][i + 1].weight;
+//            [from][to]
+//            Left
+            matrix[_matrix[j][i].tile_num - 1][_matrix[j][i].tile_num] = _matrix[j - 1][i].weight;
+            //Right
+            matrix[_matrix[j][i].tile_num + 1][_matrix[j][i].tile_num] = _matrix[j + 1][i].weight;
+            //Top
+            matrix[_matrix[j][i].tile_num - 30][_matrix[j][i].tile_num] = _matrix[j][i - 1].weight;
+            //Bottom
+            matrix[_matrix[j][i].tile_num + 30][_matrix[j][i].tile_num] = _matrix[j][i + 1].weight;
         }
+
     }
+
+//    for (int i = 0; i < 21; i++) {
+//        for (int j = 0; j < 30; j++) {
+//            if (i == 0 && j > 0 && j < 29) {
+//                //left
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 1] = _matrix[j - 1][i].weight;
+//                //bottom
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 30] = _matrix[j][i + 1].weight;
+//                //right
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 1] = _matrix[j + 1][i].weight;
+//            }
+//        else if (i == 20 && j > 0 && j < 29) {
+//                //left
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 1] = _matrix[j - 1][i].weight;
+//                //top
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 30] = _matrix[j][i - 1].weight;
+//                //right
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 1] = _matrix[j + 1][i].weight;
+//            }
+//        else if (i == 20 && j == 0) {
+//                //top
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 30] = _matrix[j][i-1].weight;
+//                //right
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 1] = _matrix[j+1][i].weight;
+//            }
+//            else if (i == 20 && j == 29) {
+//                //left
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 1] = _matrix[j - 1][i].weight;
+//                //top
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 30] = _matrix[j][i - 1].weight;
+//            }
+//            else if (i == 0 && j == 0) {
+//                //right
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 1] = _matrix[j + 1][i].weight;
+//                //bottom
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 30] = _matrix[j][i + 1].weight;
+//            }
+//            else if (i == 0 && j == 29) {
+//                //bottom
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 30] = _matrix[j][i + 1].weight;
+//                //left
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 1] = _matrix[j-1][i].weight;
+//            }
+//            else if (j == 0 && i > 0 && i < 20) {
+//                //bottom
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 30] = _matrix[j][i + 1].weight;
+//                //top
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 30] = _matrix[j][i - 1].weight;
+//                //right
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 1] = _matrix[j + 1][i].weight;
+//            }
+//            else if (j == 29 && i > 0 && i < 20) {
+//                //bottom
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num + 30] = _matrix[j][i + 1].weight;
+//                //top
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 30] = _matrix[j][i - 1].weight;
+//                //left
+//                matrix[_matrix[j][i].tile_num][_matrix[j][i].tile_num - 1] = _matrix[j - 1][i].weight;
+//            }
+//        }
+//    }
+//    for (int i = 0; i < 21; i++) {
+//        for (int j = 0; j < 30; j++) {
+//            if (i == 0 && j > 0 && j < 29) {
+//                //left
+//                matrix[_matrix[j][i].tile_num - 1][_matrix[j][i].tile_num] = _matrix[j - 1][i].weight;
+//                //bottom
+//                matrix[_matrix[j][i].tile_num + 30][_matrix[j][i].tile_num] = _matrix[j][i + 1].weight;
+//                //right
+//                matrix[_matrix[j][i].tile_num + 1][_matrix[j][i].tile_num] = _matrix[j + 1][i].weight;
+//            }
+//        else if (i == 20 && j > 0 && j < 29) {
+//                //left
+//                matrix[_matrix[j][i].tile_num - 1][_matrix[j][i].tile_num ] = _matrix[j - 1][i].weight;
+//                //top
+//                matrix[_matrix[j][i].tile_num - 30][_matrix[j][i].tile_num ] = _matrix[j][i - 1].weight;
+//                //right
+//                matrix[_matrix[j][i].tile_num + 1][_matrix[j][i].tile_num ] = _matrix[j + 1][i].weight;
+//            }
+//        else if (i == 20 && j == 0) {
+//                //top
+//                matrix[_matrix[j][i].tile_num - 30][_matrix[j][i].tile_num] = _matrix[j][i-1].weight;
+//                //right
+//                matrix[_matrix[j][i].tile_num + 1][_matrix[j][i].tile_num ] = _matrix[j+1][i].weight;
+//            }
+//            else if (i == 20 && j == 29) {
+//                //left
+//                matrix[_matrix[j][i].tile_num - 1][_matrix[j][i].tile_num] = _matrix[j - 1][i].weight;
+//                //top
+//                matrix[_matrix[j][i].tile_num - 30][_matrix[j][i].tile_num] = _matrix[j][i - 1].weight;
+//            }
+//            else if (i == 0 && j == 0) {
+//                //right
+//                matrix[_matrix[j][i].tile_num + 1][_matrix[j][i].tile_num] = _matrix[j + 1][i].weight;
+//                //bottom
+//                matrix[_matrix[j][i].tile_num + 30][_matrix[j][i].tile_num] = _matrix[j][i + 1].weight;
+//            }
+//            else if (i == 0 && j == 29) {
+//                //bottom
+//                matrix[_matrix[j][i].tile_num + 30][_matrix[j][i].tile_num] = _matrix[j][i + 1].weight;
+//                //left
+//                matrix[_matrix[j][i].tile_num - 1][_matrix[j][i].tile_num] = _matrix[j-1][i].weight;
+//            }
+//            else if (j == 0 && i > 0 && i < 20) {
+//                //bottom
+//                matrix[_matrix[j][i].tile_num + 30][_matrix[j][i].tile_num] = _matrix[j][i + 1].weight;
+//                //top
+//                matrix[_matrix[j][i].tile_num - 30][_matrix[j][i].tile_num] = _matrix[j][i - 1].weight;
+//                //right
+//                matrix[_matrix[j][i].tile_num + 1][_matrix[j][i].tile_num ] = _matrix[j + 1][i].weight;
+//            }
+//            else if (j == 29 && i > 0 && i < 20) {
+//                //bottom
+//                matrix[_matrix[j][i].tile_num + 30][_matrix[j][i].tile_num] = _matrix[j][i + 1].weight;
+//                //top
+//                matrix[_matrix[j][i].tile_num  - 30][_matrix[j][i].tile_num] = _matrix[j][i - 1].weight;
+//                //left
+//                matrix[_matrix[j][i].tile_num - 1][_matrix[j][i].tile_num] = _matrix[j - 1][i].weight;
+//            }
+//        }
+//    }
 }
 
 int Graph::getStart(){
@@ -337,23 +493,40 @@ int Graph::getEnd(){
 bool Graph::breadthFirstTrav(sf::RenderWindow& window,Graph &myGraph, int start, int end) {
     // num / 30 = row
     // mum % 30 = col
+    auto begin = chrono::high_resolution_clock::now();
+    algorithm_duration = "Time: ";
     queue<int> q;
     vector<int> used;
     q.push(start);
     used.push_back(start);
     while(!q.empty()){
         myGraph.LoadTileData();
-        window.setFramerateLimit(50);
+        window.setFramerateLimit(70);
         myGraph.UpdateGraph(window);
         window.display();
         for(int i = 0; i < myGraph.matrix.at(q.front()).size(); i++){
             if((myGraph.matrix[q.front()][i] != -1) &&(count(used.begin(), used.end(), i) == 0)){
+                myGraph.LoadTileData();
+                myGraph.UpdateGraph(window);
+                window.setFramerateLimit(70);
+                window.display();
                 if(i == end) {
+                    while(!q.empty() && q.front() != myGraph.getEnd() - 1 && q.front() != myGraph.getEnd() + 1
+                            && q.front() != myGraph.getEnd() + 30 && q.front() != myGraph.getEnd() - 30){
+                        _matrix[q.front() % 30][q.front() / 30].tile_type = 6;
+                        myGraph.LoadTileData();
+                        myGraph.UpdateGraph(window);
+                        window.setFramerateLimit(70);
+                        window.display();
+                        q.pop();
+                    }
+                    _matrix[q.front() % 30][q.front() / 30].tile_type = 6;
                     myGraph.LoadTileData();
                     myGraph.UpdateGraph(window);
-                    window.setFramerateLimit(50);
-                    window.display();
-                    cout <<"RETURNS TRUE" << endl;
+
+                    auto end1 = chrono::high_resolution_clock::now();
+                    auto duration = duration_cast<milliseconds>(end1 - begin);
+                    algorithm_duration = "Time: " + to_string(duration.count()) + "ms";
                     return true;
                 }
                 else {
@@ -361,24 +534,26 @@ bool Graph::breadthFirstTrav(sf::RenderWindow& window,Graph &myGraph, int start,
                     used.push_back(i);
                     if (_matrix[q.front() % 30][q.front() / 30].tile_type != 1 &&
                         _matrix[q.front() % 30][q.front() / 30].tile_type != 2) {
-                            cout << "WORKS" << endl;
                             _matrix[q.front() % 30][q.front() / 30].tile_type = 6;
-
-
                     }
                 }
             }
         }
         q.pop();
     }
-    cout <<"RETURNS False" << endl;
+    auto end2 = chrono::high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(end2 - begin);
+    algorithm_duration = "Time: " + to_string(duration.count()) + "ms";
     return false;
 }
 bool Graph::depthFirstTrav(sf::RenderWindow& window, Graph& myGraph, int start, int end){
+    algorithm_duration = "Time: ";
+    auto begin = chrono::high_resolution_clock::now();
     stack<int> s;
     vector<int> used;
     s.push(start);
     used.push_back(start);
+
     while(!s.empty()){
         myGraph.LoadTileData();
         myGraph.UpdateGraph(window);
@@ -387,11 +562,22 @@ bool Graph::depthFirstTrav(sf::RenderWindow& window, Graph& myGraph, int start, 
         for(int i = 0; i < myGraph.matrix[s.top()].size(); i++){
             if((myGraph.matrix[s.top()][i] != -1) && (count(used.begin(), used.end(), i) == 0)){
                 if(i == end) {
+                    while(!s.empty() && s.top() != myGraph.getEnd() - 1 && s.top() != myGraph.getEnd() + 1
+                          && s.top() != myGraph.getEnd() + 30 && s.top() != myGraph.getEnd() - 30){
+                        _matrix[s.top() % 30][s.top() / 30].tile_type = 6;
+                        myGraph.LoadTileData();
+                        myGraph.UpdateGraph(window);
+                        window.setFramerateLimit(50);
+                        window.display();
+                        s.pop();
+                    }
                     myGraph.LoadTileData();
                     myGraph.UpdateGraph(window);
                     window.setFramerateLimit(50);
                     window.display();
-                    cout << "RETURNS TRUE" << endl;
+                    auto end1 = chrono::high_resolution_clock::now();
+                    auto duration = duration_cast<milliseconds>(end1 - begin);
+                    algorithm_duration = "Time: " + to_string(duration.count()) + "ms";
                     return true;
                 }
                 else{
@@ -399,54 +585,17 @@ bool Graph::depthFirstTrav(sf::RenderWindow& window, Graph& myGraph, int start, 
                     used.push_back(i);
                     //if not start or end tile
                     if (_matrix[s.top() % 30][s.top() / 30].tile_type != 1 && _matrix[s.top() % 30][s.top() / 30].tile_type != 2) {
-                        cout << "WORKS" << endl;
                         _matrix[s.top() % 30][s.top() / 30].tile_type = 6;
-
                     }
                 }
             }
         }
         s.pop();
     }
+    auto end2 = chrono::high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(end2 - begin);
+    algorithm_duration = "Time: " + to_string(duration.count())+ "ms";
     return false;
 }
 
-//void Graph::dijkstra(Tile& startTile) {
-//    vector<int> result(630, 20000);
-//    priority_queue<pair<Tile, int>, vector<pair<Tile, int>>, greater<pair<Tile, int>>> pq;
-//    pq.push(make_pair(startTile.weight, startTile));
-//
-//    result[startTile.col + startTile.row * 21] = 0;
-//
-//    while (!pq.empty()) {
-//        int oldV = pq.top().second;
-//        pq.pop();
-//        for (int i = 0; i < 4; i++) {
-//            int v, weight;
-//
-//            // Cycle through all adjacent neighbors & check if it's accessing an invalid index.
-//            // Not added here, since I don't know how you want to phrase it, but this does
-//            // **NOT** check if the tile is a void/blocked tile!
-//
-//            if (i == 0 && oldV.row - 1 != -1) {
-//                v = matrix[oldV.col][oldV.row - 1];
-//                weight = matrix[oldV.col][oldV.row - 1].weight;
-//            } else if (i == 1 && oldV.row + 1 != 30) {
-//                v = matrix[oldV.col][oldV.row + 1];
-//                weight = matrix[oldV.col][oldV.row + 1].weight;
-//            } else if (i == 2 && oldV.col - 1 != -1) {
-//                v = matrix[oldV.col - 1][oldV.row];
-//                weight = matrix[oldV.col][oldV.row - 1].weight;
-//            } else if (i == 3 && oldV.col + 1 != 21) {
-//                v = matrix[oldV.col + 1][oldV.row];
-//                weight = matrix[oldV.col][oldV.row + 1].weight;
-//            }
-//
-//            //  If there is shorted path to v through u.
-//            if (result[v.col + v.row * 21] > result[oldV.col + oldV.row * 21] + weight) {
-//                result[v.col + v.row * 21] = result[oldV.col + oldV.row * 21] + weight
-//                pq.push(make_pair(matrix[v.col][v.row].weight, matrix[v.col][v.row]));
-//            }
-//        }
-//    }
-//}
+

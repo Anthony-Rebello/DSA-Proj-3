@@ -115,10 +115,12 @@ int main() {
             rect = graph.algorithms_hitbox_1.getGlobalBounds();
             if (rect.contains(mousePos)) {
                 graph.selected_algorithm = 1;
+                graph.algorithm_text = "Algorithm: Depth First Search";
             }
             rect = graph.algorithms_hitbox_2.getGlobalBounds();
             if (rect.contains(mousePos)) {
                 graph.selected_algorithm = 2;
+                graph.algorithm_text = "Algorithm: Breadth First Search";
             }
              rect = graph.run_btn.getGlobalBounds();
             if (rect.contains(mousePos)) {
