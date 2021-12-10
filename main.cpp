@@ -37,36 +37,42 @@ int main() {
 
             //0 = Empty; 1 = Start; 2 = End; 3 = Positive; 4 = Negative; 5 = Inaccessible 6 = Visited;
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-            for (int i = 0;i < graph.matrix[0].size(); i++) { //should get number of rows and below should be number of col 21x30
-                for (int j = 0; j < graph.matrix.size(); j++) {
-                    sf::FloatRect tile_rect = graph.matrix[j][i].sprite.getGlobalBounds();
-                    if (tile_rect.contains(mousePos) && graph.c_current_tile == "Start_Tile") {
-                        graph.matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Start_Tile"));
-                        graph.matrix[j][i].tile_type = 1;
+            for (int i = 0;i < graph._matrix[0].size(); i++) { //should get number of rows and below should be number of col 21x30
+                for (int j = 0; j < graph._matrix.size(); j++) {
+                    sf::FloatRect tile_rect = graph._matrix[j][i].sprite.getGlobalBounds();
+                    if (tile_rect.contains(mousePos) && graph.c_current_tile == "Start_Tile" && graph.getStart() == -1) {
+                        graph._matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Start_Tile"));
+                        graph._matrix[j][i].tile_type = 1;
+                        graph._matrix[j][i].weight = 0;
                     }
-                    if (tile_rect.contains(mousePos) && graph.c_current_tile == "End_Tile") {
-                        graph.matrix[j][i].sprite.setTexture(TextureManager::GetTexture("End_Tile"));
-                        graph.matrix[j][i].tile_type = 2;
+                    if (tile_rect.contains(mousePos) && graph.c_current_tile == "End_Tile" && graph.getEnd() == -1) {
+                        graph._matrix[j][i].sprite.setTexture(TextureManager::GetTexture("End_Tile"));
+                        graph._matrix[j][i].tile_type = 2;
+                        graph._matrix[j][i].weight = 0;
                     }
                     if (tile_rect.contains(mousePos) && graph.c_current_tile == "Empty_Tile") {
-                        graph.matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Empty_Tile"));
-                        graph.matrix[j][i].tile_type = 0;
+                        graph._matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Empty_Tile"));
+                        graph._matrix[j][i].tile_type = 0;
+                        graph._matrix[j][i].weight = 0;
                     }
                     if (tile_rect.contains(mousePos) && graph.c_current_tile == "Positive_Cost_Tile") {
-                        graph.matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Positive_Cost_Tile"));
-                        graph.matrix[j][i].tile_type = 3;
+                        graph._matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Positive_Cost_Tile"));
+                        graph._matrix[j][i].tile_type = 3;
                         if (!graph.c_weight.empty())
-                            graph.matrix[j][i].weight = stoi(graph.c_weight);
+                            graph._matrix[j][i].weight = stoi(graph.c_weight);
 
                     }
                     if (tile_rect.contains(mousePos) && graph.c_current_tile == "Negative_Cost_Tile") {
 
-                        graph.matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Negative_Cost_Tile"));
-                        graph.matrix[j][i].tile_type = 4;
+                        graph._matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Negative_Cost_Tile"));
+                        graph._matrix[j][i].tile_type = 4;
+                        graph._matrix[j][i].weight = 0;
                     }
                     if (tile_rect.contains(mousePos) && graph.c_current_tile == "Inaccessible_Tile") {
-                        graph.matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Inaccessible_Tile"));
-                        graph.matrix[j][i].tile_type = 5;
+                        graph._matrix[j][i].sprite.setTexture(TextureManager::GetTexture("Inaccessible_Tile"));
+                        graph._matrix[j][i].tile_type = 5;
+                        graph._matrix[j][i].weight = -1;
+
                     }
                 }
             }
@@ -106,6 +112,26 @@ int main() {
                 window.clear(sf::Color::White);
                 graph.LoadInitialGui(window);
             }
+            rect = graph.algorithms_hitbox_1.getGlobalBounds();
+            if (rect.contains(mousePos)) {
+                graph.selected_algorithm = 1;
+            }
+            rect = graph.algorithms_hitbox_2.getGlobalBounds();
+            if (rect.contains(mousePos)) {
+                graph.selected_algorithm = 2;
+            }
+             rect = graph.run_btn.getGlobalBounds();
+            if (rect.contains(mousePos)) {
+                graph.transferData();
+                if (graph.selected_algorithm == 1){
+                    graph.depthFirstTrav(window, graph,graph.getStart(), graph.getEnd());
+                }
+                else if (graph.selected_algorithm == 2){
+                    graph.breadthFirstTrav(window, graph,graph.getStart(), graph.getEnd());
+                }
+            }
+
+
         }
         }
             graph.UpdateGraph(window);
