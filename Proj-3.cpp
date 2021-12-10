@@ -2,9 +2,11 @@
 #include <vector>
 #include <queue>
 #include <stack>
+#include <set>
 #include <algorithm>
 using namespace std;
 
+/*
 struct Tile{
     bool blocked, start, end;
     unsigned int weight;
@@ -33,6 +35,7 @@ struct Tile{
         end = true;
     }
 };
+*/
 class Graph{
 
     public:
@@ -104,15 +107,20 @@ bool depthFirstTrav(Graph& myGraph, int start, int end){
     return false;
 }
 
-void dijkstra(Tile& startTile){
+vector<pair<int, int>> dijkstra(Graph& myGraph, int start, int end){
+  vector<pair<int, int>> resultPath;
+  vector<int> distances(size, 20000);
+  priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+  distances[start] = 0;
 
+  pq.push(make_pair(0, start));
+
+  while (!pq.empty()) {
+    
+  }
 }
 
-void bellmanFord(Tile& startTile){
-
-}
-
-int main(){
+/*int main(){
 
     //debug statememnt vv
     Graph g(4, 4);
@@ -126,4 +134,4 @@ int main(){
     cout << depthFirstTrav(g, 0, 12) << endl;
     cout << "this works still" << endl;
     return 0;
-}
+}*/

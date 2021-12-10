@@ -277,6 +277,8 @@ void depthFirstTrav(Tile& startTile){
 
 }
 
+// Dijkstra scrapped due to changed data structure for the matrix.
+
 //void Graph::dijkstra(Tile& startTile) {
 //    vector<int> result(630, 20000);
 //    priority_queue<pair<Tile, int>, vector<pair<Tile, int>>, greater<pair<Tile, int>>> pq;
@@ -317,6 +319,9 @@ void depthFirstTrav(Tile& startTile){
 //    }
 //}
 //
+
+// BellmanFord scrapped due to  scrapped due to changed data structure for the matrix.
+
 //void bellmanFord(Tile& startTile){
 //    vector<int> result(630, 20000);
 //    result[startTile.col + startTile.row * 21] = 0;
