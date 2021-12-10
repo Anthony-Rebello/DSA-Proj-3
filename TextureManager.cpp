@@ -1,4 +1,5 @@
 #include "TextureManager.h"
+//Inspired by Professor Fox from programming 2 project code
 unordered_map<string, sf::Texture> TextureManager::textures;
 
 void TextureManager::LoadTexture(string filename) {

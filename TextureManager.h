@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 #include <string>
+//Inspired by Professor Fox from programming 2 project code
 using std::unordered_map;
 using std::string;
 
